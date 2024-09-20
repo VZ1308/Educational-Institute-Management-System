@@ -173,16 +173,16 @@ public class GUI {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             // Tabelle für die Daten erstellen
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            String[] columnNames = new String[columnCount];
-            for (int i = 1; i <= columnCount; i++) {
-                columnNames[i - 1] = metaData.getColumnName(i);
+            ResultSetMetaData metaData = rs.getMetaData(); // Dies ist ein Objekt, das Informationen über die Struktur des Ergebnisses (Spaltennamen, Anzahl der Spalten usw.) bereitstellt
+            int columnCount = metaData.getColumnCount(); // Gibt die Anzahl der Spalten in der Abfrage zurück
+            String[] columnNames = new String[columnCount]; // Ein Array, um die Namen der Spalten zu speichern
+            for (int i = 1; i <= columnCount; i++) { //
+                columnNames[i - 1] = metaData.getColumnName(i); //  Diese Methode gibt den Namen der Spalte i zurück, und dies wird für jede Spalte wiederholt, um die Spaltennamen zu extrahieren
             }
 
-            DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+            DefaultTableModel model = new DefaultTableModel(columnNames, 0); // speichert Datenstruktur
             while (rs.next()) {
-                Object[] row = new Object[columnCount];
+                Object[] row = new Object[columnCount]; // Ein Array, das die Daten einer Zeile speichert
                 for (int i = 1; i <= columnCount; i++) {
                     row[i - 1] = rs.getObject(i);
                 }
@@ -197,7 +197,7 @@ public class GUI {
                 columnModel.getColumn(i).setPreferredWidth(150); // Setze die Breite jeder Spalte auf 150 Pixel
             }
 
-            // Scrollpane für die Tabelle erstellen und im Dialog anzeigen
+            // Scrollfunktion für die Tabelle erstellen und im Dialog anzeigen
             JScrollPane scrollPane = new JScrollPane(table);
             scrollPane.setPreferredSize(new Dimension(600, 300));
 
@@ -358,10 +358,18 @@ public class GUI {
     // Validierung eines Datums
     private static boolean isValidDate(String date) {
         try {
-            LocalDate.parse(date);
-            return true;
+            LocalDate parsedDate = LocalDate.parse(date); // Datum im ISO-Format (YYYY-MM-DD) parsen
+
+            // Überprüfen, ob das Datum in der Zukunft liegt
+            if (parsedDate.isAfter(LocalDate.now())) {
+                JOptionPane.showMessageDialog(null, "Das Datum darf nicht in der Zukunft liegen.", "Ungültiges Datum", JOptionPane.ERROR_MESSAGE);
+                return false; // Datum ist in der Zukunft
+            }
+
+            return true; // Datum ist gültig und nicht in der Zukunft
         } catch (DateTimeParseException e) {
-            return false;
+            JOptionPane.showMessageDialog(null, "Ungültiges Datum: " + date, "Ungültiges Datum", JOptionPane.ERROR_MESSAGE);
+            return false; // Ungültiges Datum
         }
     }
-}
+    }
